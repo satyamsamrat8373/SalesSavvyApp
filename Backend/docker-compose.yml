@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0.39  # Updated to match your system's MySQL version
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: system
+      MYSQL_DATABASE: salessavvy
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  sales-savvy-app:
+    image: sales-savvy-app
+    container_name: sales-savvy-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "9000:9000"
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/salessavvy
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: system
+    volumes:
+      - ./src/main/resources/application.properties:/app/config/application.properties
+
+volumes:
+  mysql_data:
